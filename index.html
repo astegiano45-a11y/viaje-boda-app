@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Viaje Boda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4efe9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      width: 360px;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 15px;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #c9a96a;
+      color: white;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: #aaa;
+    }
+
+    .invisible {
+      position: absolute;
+      opacity: 0;
+      z-index: 5;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BIENVENIDA -->
+  <div id="bienvenida" class="screen active">
+    <video src="INICIO.mp4" autoplay muted loop playsinline></video>
+
+    <!-- BOTÓN INGRESAR -->
+    <button class="invisible"
+      onclick="mostrar('menu')"
+      style="
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 60px;
+      ">
+      INGRESAR
+    </button>
+  </div>
+
+  <!-- MENU PRINCIPAL -->
+  <div id="menu" class="screen">
+    <video src="INICIO2.mp4" autoplay muted loop playsinline></video>
+
+    <!-- BOTÓN CALENDARIO -->
+    <button class="invisible"
+      onclick="mostrar('calendario')"
+      style="
+        bottom: 110px;
+        left: 22%;
+        width: 90px;
+        height: 90px;
+      ">
+    </button>
+
+    <!-- BOTÓN CUOTAS -->
+    <button class="invisible"
+      onclick="mostrar('cuotas')"
+      style="
+        bottom: 110px;
+        left: 58%;
+        width: 90px;
+        height: 90px;
+      ">
+    </button>
+  </div>
+
+  <!-- CALENDARIO -->
+  <div id="calendario" class="screen">
+    <video src="CALENDARIO.mp4" autoplay muted loop playsinline></video>
+
+    <div class="content">
+      <button onclick="mostrar('menu')">Volver</button>
+    </div>
+  </div>
+
+  <!-- CUOTAS -->
+  <div id="cuotas" class="screen">
+    <video src="COUTA.mp4" autoplay muted loop playsinline></video>
+
+    <div class="content">
+      <button onclick="mostrar('menu')">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    function mostrar(id) {
+      document.querySelectorAll('.screen').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
