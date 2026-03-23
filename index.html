@@ -3,103 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Franco & Romina - Cancún 2026</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<title>Franco & Romina</title>
 
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Georgia', serif;
 }
 
 body{
-font-family:'Montserrat',sans-serif;
-color:white;
-overflow:hidden;
-background:black;
+    background:black;
+    overflow:hidden;
+}
+
+/* FORMATO APP VERTICAL */
+@media (min-width:768px){
+    body{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        background:#111;
+    }
+    .app{
+        width:390px;
+        height:844px;
+        border-radius:30px;
+        overflow:hidden;
+        box-shadow:0 0 40px rgba(0,0,0,0.7);
+        position:relative;
+    }
+}
+
+/* MOBILE */
+@media (max-width:767px){
+    .app{
+        width:100%;
+        height:100vh;
+        position:relative;
+    }
 }
 
 .video-section{
-position:fixed;
-width:100%;
-height:100vh;
-top:0;
-left:0;
-display:flex;
-justify-content:center;
-align-items:center;
-text-align:center;
-transition:opacity 1s ease;
+    position:absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
 }
 
 video{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-z-index:-2;
+    position:absolute;
+    top:50%;
+    left:50%;
+    min-width:100%;
+    min-height:100%;
+    transform:translate(-50%,-50%);
+    object-fit:cover;
 }
 
 .overlay{
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.55);
-z-index:-1;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    color:white;
+    padding:20px;
 }
 
 h1{
-font-family:'Playfair Display',serif;
-font-size:3rem;
-letter-spacing:3px;
+    font-size:28px;
+    margin-bottom:10px;
 }
 
 .sub{
-margin-top:15px;
-font-size:1.1rem;
-letter-spacing:2px;
+    font-size:14px;
+    letter-spacing:2px;
+    margin-bottom:30px;
 }
 
 .button{
-margin-top:40px;
-padding:14px 35px;
-border:1px solid rgba(255,255,255,0.6);
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(10px);
-cursor:pointer;
-transition:0.3s;
+    padding:12px 25px;
+    border:1px solid white;
+    margin:10px;
+    cursor:pointer;
+    transition:0.3s;
+    background:transparent;
 }
 
 .button:hover{
-background:rgba(255,255,255,0.3);
+    background:white;
+    color:black;
 }
 
 .hidden{
-opacity:0;
-pointer-events:none;
-}
-
-.menu{
-display:flex;
-flex-direction:column;
-gap:20px;
+    display:none;
 }
 
 .countdown{
-font-size:2rem;
-margin-top:20px;
-}
-
-.footer{
-position:absolute;
-bottom:30px;
-width:100%;
-text-align:center;
-font-size:0.8rem;
-opacity:0.7;
+    font-size:18px;
+    margin:20px 0;
 }
 
 </style>
@@ -107,85 +117,87 @@ opacity:0.7;
 
 <body>
 
+<div class="app">
+
 <!-- BIENVENIDA -->
 <section id="welcome" class="video-section">
-<video autoplay muted loop playsinline>
-<source src="bienvenida.mp4" type="video/mp4">
-</video>
-<div class="overlay"></div>
+    <video autoplay muted loop playsinline>
+        <source src="bienvenida.mp4" type="video/mp4">
+    </video>
 
-<div>
-<h1>Franco & Romina</h1>
-<div class="sub">Cancún · México · Noviembre 2026</div>
-<div class="button" onclick="enterApp()">INGRESAR</div>
-</div>
+    <div class="overlay">
+        <h1>Franco & Romina</h1>
+        <div class="sub">Cancún · México · Noviembre 2026</div>
+        <div class="button" onclick="enterApp()">INGRESAR</div>
+    </div>
 </section>
 
-<!-- MENU PRINCIPAL -->
+<!-- MENÚ -->
 <section id="menu" class="video-section hidden">
-<video autoplay muted loop playsinline>
-<source src="menu.mp4" type="video/mp4">
-</video>
-<div class="overlay"></div>
+    <video autoplay muted loop playsinline>
+        <source src="menu.mp4" type="video/mp4">
+    </video>
 
-<div class="menu">
-<h1>Nuestra Boda en el Caribe</h1>
+    <div class="overlay">
+        <h1>Nuestra Boda en el Caribe</h1>
 
-<div class="button" onclick="showCountdown()">Cuenta Regresiva</div>
-<div class="button" onclick="alert('Próximamente cuotas estimadas USD 1700 - 2000')">Ver Cuotas</div>
-<div class="button" onclick="window.open('https://photos.google.com','_blank')">Álbum Compartido</div>
-
-</div>
+        <div class="button" onclick="showCountdown()">Cuenta Regresiva</div>
+        <div class="button" onclick="alert('Cuotas estimadas USD 1700 - 2000')">Ver Cuotas</div>
+        <div class="button" onclick="window.open('https://photos.google.com','_blank')">Álbum Compartido</div>
+    </div>
 </section>
 
 <!-- CUENTA REGRESIVA -->
 <section id="countdownSection" class="video-section hidden">
-<video autoplay muted loop playsinline>
-<source src="CUENTA REGRSIVA.mp4" type="video/mp4">
-</video>
-<div class="overlay"></div>
+    <video autoplay muted loop playsinline>
+        <source src="cuenta.mp4" type="video/mp4">
+    </video>
 
-<div>
-<h1>Falta para el gran día</h1>
-<div class="countdown" id="countdown"></div>
-<div class="button" onclick="backToMenu()">Volver</div>
-</div>
+    <div class="overlay">
+        <h1>Falta para el gran día</h1>
+        <div class="countdown" id="countdown"></div>
+        <div class="button" onclick="backToMenu()">Volver</div>
+    </div>
 </section>
+
+</div>
 
 <script>
 
-const weddingDate = new Date("2026-11-15");
+const weddingDate = new Date("November 15, 2026 18:00:00").getTime();
 
 function enterApp(){
-document.getElementById("welcome").classList.add("hidden");
-document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("welcome").classList.add("hidden");
+    document.getElementById("menu").classList.remove("hidden");
 }
 
 function showCountdown(){
-document.getElementById("menu").classList.add("hidden");
-document.getElementById("countdownSection").classList.remove("hidden");
+    document.getElementById("menu").classList.add("hidden");
+    document.getElementById("countdownSection").classList.remove("hidden");
 }
 
 function backToMenu(){
-document.getElementById("countdownSection").classList.add("hidden");
-document.getElementById("menu").classList.remove("hidden");
+    document.getElementById("countdownSection").classList.add("hidden");
+    document.getElementById("menu").classList.remove("hidden");
 }
 
-function updateCountdown(){
-const now = new Date();
-const diff = weddingDate - now;
+setInterval(function(){
 
-const days = Math.floor(diff / (1000*60*60*24));
-const hours = Math.floor((diff / (1000*60*60)) % 24);
-const minutes = Math.floor((diff / (1000*60)) % 60);
-const seconds = Math.floor((diff / 1000) % 60);
+    const now = new Date().getTime();
+    const distance = weddingDate - now;
 
-document.getElementById("countdown").innerHTML =
-`${days} días · ${hours}h · ${minutes}m · ${seconds}s`;
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-}
+    document.getElementById("countdown").innerHTML =
+        days + " días · " +
+        hours + "h · " +
+        minutes + "m · " +
+        seconds + "s";
 
-setInterval(updateCountdown,1000);
+}, 1000);
 
 </script>
 
