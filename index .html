@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Franco & Romina · 2027</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:  #faf8f6;
+  --sand:   #e8d5c4;
+  --mauve:  #b8908a;
+  --rose:   #e8c4c0;
+  --grey:   #b0adb0;
+  --teal:   #4a9ea0;
+  --teal2:  #6bbcbe;
+  --dark:   #2a3535;
+  --text:   #3d3535;
+  --light:  #f5f0ec;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;font-weight:300;background:var(--light);color:var(--text);overflow-x:hidden;}
+
+/* ══ MUSIC PLAYER FLOTANTE ══ */
+#music-player {
+  position:fixed;bottom:20px;right:16px;z-index:999;
+  background:rgba(42,53,53,0.95);
+  border:1px solid rgba(107,188,190,0.3);
+  border-radius:16px;
+  padding:12px 14px;
+  width:220px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.35);
+  backdrop-filter:blur(10px);
+  transition:transform 0.4s ease,opacity 0.4s ease;
+}
+#music-player.hidden{transform:translateY(120%);opacity:0;pointer-events:none;}
+.mp-song{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:2px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-title{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:var(--teal2);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-controls{display:flex;align-items:center;gap:8px;}
+.mp-btn{background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:18px;padding:4px;transition:color .2s;line-height:1;}
+.mp-btn:hover{color:var(--teal2);}
+.mp-btn.play-btn{width:36px;height:36px;border-radius:50%;background:var(--teal);color:white;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.mp-btn.play-btn:hover{background:var(--teal2);}
+.mp-dots{display:flex;gap:4px;margin-left:auto;}
+.mp-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:background .2s;}
+.mp-dot.active{background:var(--teal2);}
+#music-toggle{position:fixed;bottom:20px;right:16px;z-index:1000;width:48px;height:48px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;color:white;font-size:20px;box-shadow:0 4px 20px rgba(74,158,160,0.5);display:none;align-items:center;justify-content:center;transition:transform .3s;}
+#music-toggle:hover{transform:scale(1.1);}
+#music-toggle.show{display:flex;}
+
+/* ══ BARRA DE PROGRESO MÚSICA ══ */
+.mp-bar{height:2px;background:rgba(255,255,255,0.1);border-radius:2px;margin-bottom:10px;overflow:hidden;}
+.mp-fill{height:100%;background:linear-gradient(90deg,var(--mauve),var(--teal));width:0%;transition:width .5s linear;border-radius:2px;}
+
+/* ══ HERO ══ */
+#hero{
+  min-height:100vh;
+  background:linear-gradient(160deg,#e8d5c4 0%,#e8c4c0 35%,#c4d4d5 65%,#4a9ea0 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 100px;position:relative;overflow:hidden;
+}
+#hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%,rgba(74,158,160,0.2) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 20%,rgba(232,196,192,0.4) 0%,transparent 50%);
+}
+.hero-eyebrow{font-size:11px;font-weight:400;letter-spacing:5px;text-transform:uppercase;color:rgba(74,158,160,0.9);margin-bottom:20px;position:relative;animation:fadeUp 1s ease both;}
+.hero-video-wrap{width:100%;max-width:320px;border-radius:20px;overflow:hidden;margin-bottom:28px;position:relative;box-shadow:0 20px 60px rgba(42,53,53,0.2);animation:fadeUp 1s .1s ease both;}
+.hero-video-wrap video{width:100%;display:block;}
+.hero-names{font-family:'Playfair Display',serif;font-size:clamp(46px,13vw,72px);font-weight:300;font-style:italic;color:var(--dark);line-height:1.05;position:relative;animation:fadeUp 1s .2s ease both;}
+.hero-amp{font-size:.6em;color:var(--mauve);display:inline-block;margin:0 6px;}
+.hero-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--mauve),transparent);margin:20px auto;position:relative;animation:fadeUp 1s .35s ease both;}
+.hero-date{font-size:12px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:var(--dark);opacity:.7;animation:fadeUp 1s .4s ease both;}
+.hero-sub{font-size:13px;color:var(--dark);opacity:.6;letter-spacing:.5px;max-width:260px;line-height:1.8;margin-top:16px;position:relative;animation:fadeUp 1s .5s ease both;font-style:italic;}
+.wave-hero{position:absolute;bottom:0;left:0;width:100%;overflow:hidden;line-height:0;}
+.wave-hero svg{display:block;width:100%;height:70px;}
+.scroll-hint{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.4;animation:bounce 2s infinite 2.5s;}
+.scroll-hint span{font-size:9px;letter-spacing:3px;text-transform:uppercase;}
+
+/* ══ SECCIONES ══ */
+section{padding:64px 24px;max-width:480px;margin:0 auto;}
+.full-section{padding:64px 24px;width:100%;}
+.full-inner{max-width:480px;margin:0 auto;}
+.section-tag{font-size:10px;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:8px;}
+.section-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:300;font-style:italic;color:var(--dark);margin-bottom:8px;line-height:1.2;}
+.section-line{width:40px;height:2px;background:linear-gradient(90deg,var(--mauve),var(--teal));border-radius:2px;margin-bottom:28px;}
+
+/* ══ CUENTA REGRESIVA ══ */
+#countdown{background:linear-gradient(135deg,var(--dark) 0%,#3a4f50 100%);text-align:center;padding:64px 24px;}
+#countdown .section-tag{color:var(--teal2);}
+#countdown .section-title{color:white;}
+#countdown .section-line{margin:0 auto 36px;}
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:380px;margin:0 auto 28px;}
+.cd-item{background:rgba(255,255,255,0.06);border:1px solid rgba(107,188,190,0.2);border-radius:12px;padding:16px 6px 12px;}
+.cd-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:300;color:var(--teal2);display:block;line-height:1;}
+.cd-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);display:block;margin-top:6px;}
+.btn-cal{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:white;background:var(--teal);border:none;border-radius:8px;padding:12px 20px;cursor:pointer;text-decoration:none;transition:background .3s;}
+.btn-cal:hover{background:var(--teal2);}
+
+/* ══ LUGAR ══ */
+.lugar-card{background:white;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 24px rgba(42,53,53,0.08);}
+.lugar-emoji{width:100%;height:160px;background:linear-gradient(135deg,var(--sand),var(--teal));display:flex;align-items:center;justify-content:center;font-size:56px;}
+.lugar-body{padding:20px;}
+.lugar-type{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);font-weight:500;margin-bottom:5px;}
+.lugar-name{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:var(--dark);margin-bottom:4px;}
+.lugar-addr{font-size:12px;color:var(--grey);line-height:1.5;margin-bottom:14px;}
+.btn-mapa{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:white;background:var(--teal);border:none;border-radius:6px;padding:10px 16px;cursor:pointer;text-decoration:none;transition:background .3s;}
+.btn-mapa:hover{background:#3a8e90;}
+
+/* ══ CRONOGRAMA ══ */
+.vid-wrap{width:100%;border-radius:14px;overflow:hidden;margin-bottom:24px;box-shadow:0 8px 30px rgba(42,53,53,0.1);}
+.vid-wrap video{width:100%;display:block;}
+.timeline{position:relative;padding-left:18px;}
+.timeline::before{content:'';position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--rose),var(--teal));}
+.tl-item{position:relative;padding:0 0 26px 26px;}
+.tl-item::before{content:'';position:absolute;left:-9px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--mauve);border:2px solid white;box-shadow:0 0 0 2px var(--mauve);}
+.tl-hour{font-size:10px;font-weight:500;color:var(--teal);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+.tl-event{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;color:var(--dark);}
+.tl-desc{font-size:12px;color:var(--grey);margin-top:2px;}
+
+/* ══ DRESSCODE ══ */
+#dresscode{background:linear-gradient(160deg,#f5f0ec,var(--sand));text-align:center;padding:64px 24px;}
+#dresscode .section-line{margin:0 auto 26px;}
+.dress-main{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:var(--dark);margin-bottom:8px;}
+.dress-sub{font-size:13px;color:var(--grey);margin-bottom:28px;line-height:1.7;max-width:320px;margin-left:auto;margin-right:auto;}
+.swatches{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+.swatch{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.swatch-c{width:52px;height:52px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);box-shadow:0 4px 14px rgba(0,0,0,0.1);}
+.swatch-l{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--grey);}
+.dress-note{font-size:12px;color:var(--mauve);font-style:italic;margin-top:8px;}
+
+/* ══ CUOTAS ══ */
+.cuota-item{display:flex;align-items:center;gap:14px;background:white;border-radius:12px;padding:15px 16px;margin-bottom:10px;box-shadow:0 2px 12px rgba(42,53,53,0.06);}
+.cuota-n{font-family:'Playfair Display',serif;font-size:28px;font-weight:300;color:var(--mauve);min-width:34px;}
+.cuota-info{flex:1;}
+.cuota-titulo{font-size:13px;font-weight:400;color:var(--dark);}
+.cuota-fecha{font-size:11px;color:var(--grey);margin-top:2px;}
+.cuota-monto{font-family:'Playfair Display',serif;font-size:18px;color:var(--teal);font-weight:300;}
+.badge-ok{display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#6ab87e;border:1px solid rgba(106,184,126,0.4);border-radius:20px;padding:2px 8px;margin-top:3px;}
+
+/* ══ FORMULARIOS ══ */
+.form-card{background:white;border-radius:16px;padding:22px;box-shadow:0 4px 24px rgba(42,53,53,0.07);margin-bottom:14px;}
+.form-card h3{font-family:'Playfair Display',serif;font-size:19px;font-style:italic;color:var(--dark);margin-bottom:14px;}
+.form-field{width:100%;border:1px solid rgba(176,173,176,0.4);border-radius:8px;padding:12px 14px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;color:var(--text);background:var(--light);margin-bottom:10px;outline:none;transition:border-color .3s;}
+.form-field:focus{border-color:var(--teal);}
+.form-field::placeholder{color:var(--grey);}
+textarea.form-field{min-height:76px;resize:vertical;}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#25D366;color:white;border:none;border-radius:8px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .3s;margin-top:4px;text-decoration:none;}
+.btn-wa:hover{background:#1ebd58;}
+.btn-wa.teal{background:var(--teal);}
+.btn-wa.teal:hover{background:var(--teal2);}
+
+/* ══ CONFIRMACIÓN ══ */
+#confirmacion{background:linear-gradient(160deg,var(--dark),#3a4f50);color:white;text-align:center;padding:64px 24px;}
+#confirmacion .section-tag{color:var(--teal2);}
+#confirmacion .section-title{color:white;}
+#confirmacion .section-line{margin:0 auto 28px;}
+.asist-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;max-width:400px;margin-left:auto;margin-right:auto;}
+.asist-btn{padding:13px;border-radius:8px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);transition:all .3s;}
+.asist-btn.selected,.asist-btn:hover{background:var(--teal);color:white;border-color:var(--teal);}
+.conf-field{width:100%;max-width:400px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 14px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;color:white;background:rgba(255,255,255,0.07);margin-bottom:10px;outline:none;transition:border-color .3s;display:block;margin-left:auto;margin-right:auto;}
+.conf-field:focus{border-color:var(--teal2);}
+.conf-field::placeholder{color:rgba(255,255,255,0.3);}
+textarea.conf-field{min-height:76px;resize:none;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center;}
+.chip{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:400;letter-spacing:1px;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);cursor:pointer;transition:all .3s;background:transparent;}
+.chip.selected,.chip:hover{background:var(--mauve);color:white;border-color:var(--mauve);}
+.conf-nota{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:16px;font-style:italic;}
+.wa-btns{display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto;}
+
+/* ══ FOOTER ══ */
+footer{background:var(--dark);color:rgba(255,255,255,0.3);text-align:center;padding:32px 24px;font-size:11px;letter-spacing:1px;}
+footer .f-names{font-family:'Playfair Display',serif;font-style:italic;font-size:24px;color:rgba(255,255,255,0.35);margin-bottom:8px;}
+
+/* ══ WAVE ══ */
+.wave-sep{width:100%;overflow:hidden;line-height:0;}
+.wave-sep svg{display:block;width:100%;}
+
+/* ══ ANIMACIONES ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- ══ MUSIC PLAYER ══ -->
+<div id="music-player">
+  <div class="mp-song">reproduciendo</div>
+  <div class="mp-title" id="mp-title">Cargando...</div>
+  <div class="mp-bar"><div class="mp-fill" id="mp-fill"></div></div>
+  <div class="mp-controls">
+    <button class="mp-btn" onclick="prevSong()" title="Anterior">⏮</button>
+    <button class="mp-btn play-btn" id="mp-play" onclick="togglePlay()">▶</button>
+    <button class="mp-btn" onclick="nextSong()" title="Siguiente">⏭</button>
+    <div class="mp-dots" id="mp-dots"></div>
+  </div>
+</div>
+<button id="music-toggle" onclick="togglePlayer()" title="Música">🎵</button>
+
+<!-- iframe oculto de YouTube -->
+<div id="yt-player" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;"></div>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <span class="hero-eyebrow">✦ nos casamos ✦</span>
+  <div class="hero-video-wrap">
+    <video src="INICIO.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <h1 class="hero-names">Franco<span class="hero-amp">&</span>Romina</h1>
+  <div class="hero-divider"></div>
+  <p class="hero-date">Febrero · 2027 · Punta Cana 🌴</p>
+  <p class="hero-sub">"El amor no se busca, se encuentra — en el lugar y momento exacto."</p>
+  <div class="scroll-hint"><span>deslizá</span></div>
+  <div class="wave-hero">
+    <svg viewBox="0 0 1200 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,35 C150,70 350,0 600,35 C850,70 1050,0 1200,35 L1200,70 L0,70 Z" fill="#f5f0ec"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ══ CUENTA REGRESIVA ══ -->
+<div id="countdown">
+  <span class="section-tag">⏳ faltan...</span>
+  <h2 class="section-title">Nuestra Fecha</h2>
+  <div class="section-line"></div>
+  <div class="cd-grid">
+    <div class="cd-item"><span class="cd-num" id="cd-d">--</span><span class="cd-label">días</span></div>
+    <div class="cd-item"><span class="cd-num" id="cd-h">--</span><span class="cd-label">horas</span></div>
+    <div class="cd-item"><span class="cd-num" id="cd-m">--</span><span class="cd-label">min</span></div>
+    <div class="cd-item"><span class="cd-num" id="cd-s">--</span><span class="cd-label">seg</span></div>
+  </div>
+  <a class="btn-cal" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Boda+Franco+%26+Romina&dates=20270214T180000Z/20270215T060000Z&details=La+boda+de+Franco+y+Romina+en+Punta+Cana&location=Punta+Cana,+Rep%C3%BAblica+Dominicana" target="_blank">
+    📅 Agendar en Google Calendar
+  </a>
+</div>
+
+<div class="wave-sep"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,20 C300,40 900,0 1200,20 L1200,40 L0,40 Z" fill="#f5f0ec"/></svg></div>
+
+<!-- ══ LUGAR ══ -->
+<section id="lugar" class="reveal">
+  <span class="section-tag">📍 dónde</span>
+  <h2 class="section-title">El gran día</h2>
+  <div class="section-line"></div>
+  <div class="lugar-card">
+    <div class="lugar-emoji">🌊🌴</div>
+    <div class="lugar-body">
+      <div class="lugar-type">Ceremonia · Fiesta</div>
+      <div class="lugar-name">Playa del Caribe · Punta Cana</div>
+      <div class="lugar-addr">República Dominicana<br>Febrero 2027 · Horario a confirmar</div>
+      <a class="btn-mapa" href="https://maps.app.goo.gl/PuntaCana" target="_blank">📍 Ver en mapa</a>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--grey);text-align:center;font-style:italic;margin-top:6px;">* Ubicación exacta y horarios se confirmarán próximamente</p>
+</section>
+
+<!-- ══ CRONOGRAMA ══ -->
+<section id="cronograma" class="reveal">
+  <span class="section-tag">🗓 itinerario</span>
+  <h2 class="section-title">Calendario de actividades</h2>
+  <div class="section-line"></div>
+  <div class="vid-wrap">
+    <video src="CALENDARIO.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-hour">Día 1</div>
+      <div class="tl-event">Llegada al destino 🛬</div>
+      <div class="tl-desc">Check-in · Tarde de playa libre</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-hour">Día 2 · La Boda</div>
+      <div class="tl-event">Ceremonia en la playa 💍</div>
+      <div class="tl-desc">Al atardecer · Hora a confirmar</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-hour">Noche</div>
+      <div class="tl-event">Celebración & Fiesta 🎉</div>
+      <div class="tl-desc">Cena · Baile · Noche caribeña</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-hour">Días siguientes</div>
+      <div class="tl-event">Actividades grupales 🤿</div>
+      <div class="tl-desc">Excursiones · Playa · Relax</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-hour">Último día</div>
+      <div class="tl-event">Regreso 🛫</div>
+      <div class="tl-desc">Check-out · Vuelo de regreso</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DRESSCODE ══ -->
+<div id="dresscode">
+  <span class="section-tag">👗 vestimenta</span>
+  <h2 class="section-title">Dresscode</h2>
+  <div class="section-line"></div>
+  <div class="dress-main">Ambientado para la Playa 🌴</div>
+  <p class="dress-sub">Queremos que estés cómodo/a y disfrutes al máximo. Ropa liviana, colores naturales, ¡vibra caribeña!</p>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-c" style="background:#faf8f6;border-color:#e0dbd5;"></div><span class="swatch-l">Blanco*</span></div>
+    <div class="swatch"><div class="swatch-c" style="background:#e8d5c4;"></div><span class="swatch-l">Arena</span></div>
+    <div class="swatch"><div class="swatch-c" style="background:#e8c4c0;"></div><span class="swatch-l">Rosa</span></div>
+    <div class="swatch"><div class="swatch-c" style="background:#b0adb0;"></div><span class="swatch-l">Gris</span></div>
+    <div class="swatch"><div class="swatch-c" style="background:#4a9ea0;"></div><span class="swatch-l">Turquesa</span></div>
+  </div>
+  <p class="dress-note">✦ El blanco queda reservado para la novia ✦</p>
+</div>
+
+<div class="wave-sep" style="background:linear-gradient(160deg,#f5f0ec,var(--sand));"><svg viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0 C300,40 900,0 1200,0 L1200,40 L0,40 Z" fill="#f5f0ec"/></svg></div>
+
+<!-- ══ CUOTAS ══ -->
+<section id="cuotas" class="reveal">
+  <span class="section-tag">💳 viaje</span>
+  <h2 class="section-title">Plan de cuotas</h2>
+  <div class="section-line"></div>
+  <div class="vid-wrap">
+    <video src="COUTA.mp4" autoplay muted loop playsinline></video>
+  </div>
+  <div class="cuota-item">
+    <div class="cuota-n">01</div>
+    <div class="cuota-info"><div class="cuota-titulo">Reserva inicial</div><div class="cuota-fecha">Vencimiento a confirmar</div><span class="badge-ok">✓ Pagada</span></div>
+    <div class="cuota-monto">$——</div>
+  </div>
+  <div class="cuota-item">
+    <div class="cuota-n">02</div>
+    <div class="cuota-info"><div class="cuota-titulo">Segunda cuota</div><div class="cuota-fecha">Vencimiento a confirmar</div></div>
+    <div class="cuota-monto">$——</div>
+  </div>
+  <div class="cuota-item">
+    <div class="cuota-n">03</div>
+    <div class="cuota-info"><div class="cuota-titulo">Tercera cuota</div><div class="cuota-fecha">Vencimiento a confirmar</div></div>
+    <div class="cuota-monto">$——</div>
+  </div>
+  <div class="cuota-item">
+    <div class="cuota-n">04</div>
+    <div class="cuota-info"><div class="cuota-titulo">Saldo final</div><div class="cuota-fecha">Vencimiento a confirmar</div></div>
+    <div class="cuota-monto">$——</div>
+  </div>
+  <p style="font-size:11px;color:var(--grey);text-align:center;margin-top:10px;font-style:italic;">* Montos y fechas se actualizarán próximamente</p>
+</section>
+
+<!-- ══ PLAYLIST ══ -->
+<div class="full-section reveal" style="background:linear-gradient(160deg,#f0ebe6,#e8d5c4);">
+  <div class="full-inner">
+    <span class="section-tag">🎵 música</span>
+    <h2 class="section-title">Sugerí una canción</h2>
+    <div class="section-line"></div>
+
+    <!-- Mini player visual -->
+    <div style="background:white;border-radius:14px;padding:18px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(42,53,53,0.07);">
+      <p style="font-size:11px;color:var(--grey);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Nuestra playlist</p>
+      <div id="playlist-display" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="pl-track active-track" data-idx="0">
+          <span class="pl-num">01</span>
+          <div class="pl-info"><div class="pl-tname">Algo Contigo</div><div class="pl-artist">Noel Schajris</div></div>
+          <span class="pl-note">♪</span>
+        </div>
+        <div class="pl-track" data-idx="1">
+          <span class="pl-num">02</span>
+          <div class="pl-info"><div class="pl-tname">Por El Resto De Mi Vida</div><div class="pl-artist">Sin Bandera</div></div>
+          <span class="pl-note">♪</span>
+        </div>
+        <div class="pl-track" data-idx="2">
+          <span class="pl-num">03</span>
+          <div class="pl-info"><div class="pl-tname">No Me Doy Por Vencido</div><div class="pl-artist">Luis Fonsi</div></div>
+          <span class="pl-note">♪</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3>¿Qué tema no puede faltar? 🎶</h3>
+      <input class="form-field" id="pl-nombre" type="text" placeholder="Tu nombre y apellido">
+      <input class="form-field" id="pl-cancion" type="text" placeholder="Artista – Canción">
+      <a class="btn-wa" href="#" onclick="enviarPlaylist(event)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.062.524 4.004 1.443 5.702L0 24l6.479-1.424A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.359-.213-3.724.818.836-3.624-.234-.372A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+        Enviar sugerencia a Franco
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BUZÓN ══ -->
+<section id="buzon" class="reveal">
+  <span class="section-tag">💌 deseos</span>
+  <h2 class="section-title">Buzón de deseos</h2>
+  <div class="section-line"></div>
+  <div class="form-card">
+    <h3>Dejanos tu mensaje 🤍</h3>
+    <p style="font-size:12px;color:var(--grey);margin-bottom:14px;line-height:1.6;">Nos encantaría leer tus buenos deseos. Lo recordaremos para siempre...</p>
+    <input class="form-field" id="bz-nombre" type="text" placeholder="Tu nombre y apellido">
+    <textarea class="form-field" id="bz-mensaje" placeholder="Tu mensaje para nosotros ✨"></textarea>
+    <a class="btn-wa teal" href="#" onclick="enviarBuzon(event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.062.524 4.004 1.443 5.702L0 24l6.479-1.424A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.359-.213-3.724.818.836-3.624-.234-.372A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+      Enviar mensaje a Romina
+    </a>
+  </div>
+</section>
+
+<!-- ══ CONFIRMACIÓN ══ -->
+<div id="confirmacion">
+  <span class="section-tag">✅ asistencia</span>
+  <h2 class="section-title">Confirmación</h2>
+  <div class="section-line"></div>
+  <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:22px;line-height:1.6;max-width:360px;margin-left:auto;margin-right:auto;">¡Te esperamos! Confirmá tu presencia para que podamos organizar todo. 🌴</p>
+  <div class="asist-grid">
+    <button class="asist-btn" id="btn-si" onclick="selAsist('si')">✓ Sí asistiré</button>
+    <button class="asist-btn" id="btn-no" onclick="selAsist('no')">✗ No podré ir</button>
+  </div>
+  <input class="conf-field" id="conf-nombre" type="text" placeholder="Tu nombre y apellido">
+  <textarea class="conf-field" id="conf-msg" placeholder="Mensaje opcional..."></textarea>
+  <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;">¿Tenés alguna restricción alimentaria?</p>
+  <div class="chips">
+    <button class="chip" onclick="toggleChip(this)">Celíac@</button>
+    <button class="chip" onclick="toggleChip(this)">Vegetarian@</button>
+    <button class="chip" onclick="toggleChip(this)">Hipertensión</button>
+    <button class="chip" onclick="toggleChip(this)">Diabétic@</button>
+    <button class="chip" onclick="toggleChip(this)">Ninguna</button>
+  </div>
+  <p class="conf-nota">Confirmá antes del <strong style="color:var(--teal2);">Diciembre 2026</strong></p>
+  <div class="wa-btns">
+    <a class="btn-wa" href="#" onclick="confirmar('franco',event)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.062.524 4.004 1.443 5.702L0 24l6.479-1.424A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.359-.213-3.724.818.836-3.624-.234-.372A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+      Confirmar a Franco
+    </a>
+    <a class="btn-wa" href="#" onclick="confirmar('romina',event)" style="background:#128C7E;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.062.524 4.004 1.443 5.702L0 24l6.479-1.424A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.372l-.359-.213-3.724.818.836-3.624-.234-.372A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+      Confirmar a Romina
+    </a>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="f-names">Franco & Romina</div>
+  <p>Febrero 2027 · Punta Cana 🌴</p>
+  <p style="margin-top:10px;">Con todo nuestro amor, los esperamos 🤍</p>
+</footer>
+
+<style>
+/* playlist track styles */
+.pl-track{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .2s;}
+.pl-track:hover{background:var(--light);}
+.pl-track.active-track{background:linear-gradient(135deg,rgba(74,158,160,0.08),rgba(184,144,138,0.08));border:1px solid rgba(74,158,160,0.2);}
+.pl-num{font-family:'Playfair Display',serif;font-size:18px;color:var(--mauve);min-width:24px;font-weight:300;}
+.pl-track.active-track .pl-num{color:var(--teal);}
+.pl-info{flex:1;}
+.pl-tname{font-size:13px;font-weight:400;color:var(--dark);}
+.pl-artist{font-size:11px;color:var(--grey);margin-top:1px;}
+.pl-note{color:var(--teal);font-size:16px;opacity:.6;}
+.pl-track.active-track .pl-note{opacity:1;animation:notePulse 1.5s infinite;}
+@keyframes notePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.3);}}
+</style>
+
+<script>
+/* ══ WHATSAPP NUMBERS ══ */
+const WA_FRANCO = '5429646298';
+const WA_ROMINA = '5492964415541';
+
+/* ══ PLAYLIST ══ */
+const SONGS = [
+  { id:'4ONfrkskNp4', title:'Algo Contigo',            artist:'Noel Schajris'  },
+  { id:'KzqoSeVMGrQ', title:'Por El Resto De Mi Vida', artist:'Sin Bandera'    },
+  { id:'_BBKacJqZCU', title:'No Me Doy Por Vencido',   artist:'Luis Fonsi'     }
+];
+let currentSong = 0;
+let playing     = false;
+let ytReady     = false;
+let player;
+let fillInterval;
+
+/* YouTube API */
+function onYouTubeIframeAPIReady() {
+  ytReady = true;
+  player = new YT.Player('yt-player', {
+    height:'1', width:'1',
+    videoId: SONGS[0].id,
+    playerVars:{ autoplay:0, controls:0, loop:0 },
+    events:{
+      onReady: () => { buildDots(); updateUI(); document.getElementById('music-toggle').classList.add('show'); },
+      onStateChange: onPlayerState
+    }
+  });
+}
+
+function onPlayerState(e) {
+  if (e.data === YT.PlayerState.ENDED) nextSong();
+  if (e.data === YT.PlayerState.PLAYING) {
+    playing = true;
+    document.getElementById('mp-play').textContent = '⏸';
+    startFill();
+  }
+  if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.BUFFERING) {
+    if (e.data === YT.PlayerState.PAUSED) { playing = false; document.getElementById('mp-play').textContent = '▶'; }
+  }
+}
+
+function buildDots() {
+  const c = document.getElementById('mp-dots');
+  c.innerHTML = '';
+  SONGS.forEach((_,i) => {
+    const d = document.createElement('span');
+    d.className = 'mp-dot' + (i===currentSong?' active':'');
+    d.onclick = () => playSong(i);
+    c.appendChild(d);
+  });
+}
+
+function updateUI() {
+  const s = SONGS[currentSong];
+  document.getElementById('mp-title').textContent = s.title + ' · ' + s.artist;
+  document.querySelectorAll('.mp-dot').forEach((d,i) => d.classList.toggle('active', i===currentSong));
+  document.querySelectorAll('.pl-track').forEach((t,i) => t.classList.toggle('active-track', i===currentSong));
+  document.getElementById('mp-fill').style.width = '0%';
+}
+
+function startFill() {
+  clearInterval(fillInterval);
+  fillInterval = setInterval(() => {
+    if (!player || !player.getDuration) return;
+    const dur = player.getDuration();
+    const cur = player.getCurrentTime();
+    if (dur > 0) document.getElementById('mp-fill').style.width = (cur/dur*100) + '%';
+  }, 800);
+}
+
+function playSong(idx) {
+  currentSong = idx;
+  updateUI();
+  if (player && ytReady) { player.loadVideoById(SONGS[idx].id); player.playVideo(); playing = true; document.getElementById('mp-play').textContent = '⏸'; }
+}
+
+function togglePlay() {
+  if (!player || !ytReady) return;
+  if (playing) { player.pauseVideo(); }
+  else         { player.playVideo(); }
+}
+
+function nextSong() { playSong((currentSong+1) % SONGS.length); }
+function prevSong() { playSong((currentSong - 1 + SONGS.length) % SONGS.length); }
+
+/* Clicks en playlist visual */
+document.querySelectorAll('.pl-track').forEach(t => {
+  t.onclick = () => playSong(parseInt(t.dataset.idx));
+});
+
+/* Toggle player visible */
+let playerVisible = true;
+function togglePlayer() {
+  playerVisible = !playerVisible;
+  document.getElementById('music-player').classList.toggle('hidden', !playerVisible);
+  document.getElementById('music-toggle').textContent = playerVisible ? '🎵' : '🎵';
+}
+
+/* Carga YouTube API */
+(function(){
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+})();
+
+/* ══ CUENTA REGRESIVA ══ */
+const BODA = new Date('2027-02-14T18:00:00');
+function tick() {
+  const diff = BODA - new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(i=>document.getElementById(i).textContent='00');return;}
+  document.getElementById('cd-d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+tick(); setInterval(tick,1000);
+
+/* ══ ASISTENCIA ══ */
+let asistencia='';
+function selAsist(v){
+  asistencia=v;
+  document.getElementById('btn-si').classList.toggle('selected',v==='si');
+  document.getElementById('btn-no').classList.toggle('selected',v==='no');
+}
+function toggleChip(el){el.classList.toggle('selected');}
+
+function confirmar(quien,e){
+  e.preventDefault();
+  const nombre=document.getElementById('conf-nombre').value.trim();
+  const msg   =document.getElementById('conf-msg').value.trim();
+  const dietas=[...document.querySelectorAll('.chip.selected')].map(c=>c.textContent).join(', ');
+  if(!nombre){alert('Por favor ingresá tu nombre');return;}
+  const asistTxt=asistencia==='si'?'✅ SÍ asistiré':asistencia==='no'?'❌ NO podré ir':'(sin confirmar)';
+  let txt=`🌴 *Boda Franco & Romina · Feb 2027*\n\n${asistTxt}\n👤 *Nombre:* ${nombre}`;
+  if(dietas) txt+=`\n🍽️ *Dieta:* ${dietas}`;
+  if(msg)    txt+=`\n💬 *Mensaje:* ${msg}`;
+  const num=quien==='franco'?WA_FRANCO:WA_ROMINA;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+function enviarPlaylist(e){
+  e.preventDefault();
+  const n=document.getElementById('pl-nombre').value.trim();
+  const c=document.getElementById('pl-cancion').value.trim();
+  if(!n||!c){alert('Completá tu nombre y la canción');return;}
+  window.open(`https://wa.me/${WA_FRANCO}?text=${encodeURIComponent('🎵 *Sugerencia de canción · Boda Franco & Romina*\n👤 '+n+'\n🎶 '+c)}`,'_blank');
+}
+
+function enviarBuzon(e){
+  e.preventDefault();
+  const n=document.getElementById('bz-nombre').value.trim();
+  const m=document.getElementById('bz-mensaje').value.trim();
+  if(!n||!m){alert('Completá tu nombre y tu mensaje');return;}
+  window.open(`https://wa.me/${WA_ROMINA}?text=${encodeURIComponent('💌 *Buzón de deseos · Boda Franco & Romina*\n👤 '+n+'\n✨ '+m)}`,'_blank');
+}
+
+/* ══ REVEAL ON SCROLL ══ */
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
